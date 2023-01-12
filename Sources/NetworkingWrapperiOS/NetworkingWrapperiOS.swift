@@ -11,7 +11,7 @@ public enum NetworkError: Error {
 public class NetworkWrapper {
     private let session: URLSession
 
-    init(session: URLSession = .shared) {
+    public init(session: URLSession = .shared) {
         self.session = session
     }
 
