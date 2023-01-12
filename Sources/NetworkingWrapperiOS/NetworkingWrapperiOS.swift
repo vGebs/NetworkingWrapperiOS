@@ -1,6 +1,6 @@
 import Foundation
 
-enum NetworkError: Error {
+public enum NetworkError: Error {
     case invalidURL
     case invalidResponse
     case statusCode(Int)
@@ -8,7 +8,7 @@ enum NetworkError: Error {
     case unexpectedError(Error)
 }
 
-class NetworkWrapper {
+public class NetworkWrapper {
     private let session: URLSession
 
     init(session: URLSession = .shared) {
