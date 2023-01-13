@@ -3,6 +3,8 @@
 `NetworkWrapperiOS` is a networking wrapper class written in Swift that provides a simple and easy-to-use interface for making network requests. It's built on top of `URLSession` and it handles the response of the requests using closures.
 
 ## Features
+- Supports GET, POST, PUT, PATCH and DELETE HTTP methods
+- Automatically handles JSON decoding and encoding
 - Simple and easy-to-use interface
 - Provides two main functions:
     - `request(url:completion:)`: makes a request to the provided `URL` and returns the `Data` in the completion block
@@ -25,19 +27,24 @@ You can install `NetworkWrapperiOS` using the [Swift Package Manager](https://sw
 ```swift
 let networkWrapper = NetworkWrapper()
 let url = URL(string: "https://jsonplaceholder.typicode.com/users")!
+let urlRequest = URLRequest(url: url)
 
-networkWrapper.request(url: url) { (data: Data?, error: Error?) in
-    if let data = data {
+// Using the non-generic request function
+networkWrapper.request(with: urlRequest) { result in
+    switch result {
+    case .success(let data):
         print("Data: \(data)")
-    } else if let error = error {
+    case .failure(let error):
         print("Error: \(error)")
     }
 }
 
-networkWrapper.request(url: url) { (users: [User]?, error: Error?) in
-    if let users = users {
+// Using the generic request function
+networkWrapper.request(with: urlRequest) { result in
+    switch result {
+    case .success(let users):
         print("Users: \(users)")
-    } else if let error = error {
+    case .failure(let error):
         print("Error: \(error)")
     }
 }
