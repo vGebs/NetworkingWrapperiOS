@@ -1,22 +1,22 @@
 import Foundation
 
-public enum NetworkError: Error {
-    case invalidURL
-    case invalidResponse
-    case statusCode(Int)
-    case decodingError
-    case unexpectedError(Error)
-}
-
 public class NetworkWrapper {
+    public enum NetworkError: Error {
+        case invalidURL
+        case invalidResponse
+        case statusCode(Int)
+        case decodingError
+        case unexpectedError(Error)
+    }
+
     private let session: URLSession
 
     public init(session: URLSession = .shared) {
         self.session = session
     }
 
-    public func request(url: URL, completion: @escaping (Result<Data, NetworkError>) -> Void) {
-        session.dataTask(with: url) { data, response, error in
+    public func request(with request: URLRequest, completion: @escaping (Result<Data, NetworkError>) -> Void) {
+        session.dataTask(with: request) { data, response, error in
             if let error = error {
                 completion(.failure(.unexpectedError(error)))
                 return
@@ -41,8 +41,8 @@ public class NetworkWrapper {
         }.resume()
     }
 
-    public func request<T: Decodable>(url: URL, completion: @escaping (Result<T, NetworkError>) -> Void) {
-        request(url: url) { result in
+    public func request<T: Decodable>(with urlRequest: URLRequest, completion: @escaping (Result<T, NetworkError>) -> Void) {
+        request(with: urlRequest) { result in
             switch result {
             case .success(let data):
                 do {

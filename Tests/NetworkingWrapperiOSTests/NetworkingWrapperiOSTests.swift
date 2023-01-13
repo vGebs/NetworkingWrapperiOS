@@ -2,46 +2,38 @@ import XCTest
 @testable import NetworkingWrapperiOS
 
 class NetworkWrapperTests: XCTestCase {
-    var networkWrapper: NetworkWrapper!
-    var testUrl: URL!
-
-    override func setUp() {
-        super.setUp()
-        networkWrapper = NetworkWrapper()
-        testUrl = URL(string: "https://jsonplaceholder.typicode.com/users")!
-    }
-
-    override func tearDown() {
-        networkWrapper = nil
-        testUrl = nil
-        super.tearDown()
-    }
+    let networkWrapper = NetworkWrapper()
+    let usersUrl = URL(string: "https://jsonplaceholder.typicode.com/users")!
 
     func testRequestData() {
-        let expectation = self.expectation(description: "Request should succeed")
-        networkWrapper.request(url: testUrl) { result in
+        let expectation = self.expectation(description: "Request data")
+
+        networkWrapper.request(with: URLRequest(url: usersUrl)) { result in
             switch result {
             case .success(let data):
-                XCTAssertNotNil(data, "Data should not be nil")
+                XCTAssert(data.count > 0)
                 expectation.fulfill()
-            case .failure:
-                XCTFail("Request should succeed")
+            case .failure(let error):
+                XCTFail(error.localizedDescription)
             }
         }
+
         waitForExpectations(timeout: 5, handler: nil)
     }
 
     func testRequestDecodable() {
-        let expectation = self.expectation(description: "Request should succeed")
-        networkWrapper.request(url: testUrl) { (result: Result<[User], NetworkError>) in
+        let expectation = self.expectation(description: "Request decodable")
+
+        networkWrapper.request(with: URLRequest(url: usersUrl)) { result in
             switch result {
             case .success(let users):
-                XCTAssertNotNil(users, "Users should not be nil")
+                XCTAssert(users.count > 0)
                 expectation.fulfill()
-            case .failure:
-                XCTFail("Request should succeed")
+            case .failure(let error):
+                XCTFail(error.localizedDescription)
             }
         }
+
         waitForExpectations(timeout: 5, handler: nil)
     }
 }

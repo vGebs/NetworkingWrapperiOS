@@ -8,29 +8,30 @@
 import Foundation
 
 @available(iOS 13.0, *)
-class SampleUsageService: ObservableObject {
-    let network = NetworkWrapper()
-    let url = URL(string: "https://jsonplaceholder.typicode.com/users")!
-    
-    func makeRequest(){
-        network.request(url: url) { (result: Result<Data, NetworkError>) in
-            switch result {
-            case .success(let data):
-                print("Data: \(data)")
-            case .failure(let error):
-                print("Error: \(error)")
-            }
+class SampleUsageService {
+    private let networkWrapper = NetworkWrapper()
+    private let baseURL = URL(string: "https://jsonplaceholder.typicode.com")!
+
+    func getUsers(completion: @escaping (Result<[User], NetworkWrapper.NetworkError>) -> Void) {
+        let request = URLRequest(url: baseURL.appendingPathComponent("users"))
+        networkWrapper.request(with: request) { (result: Result<[User], NetworkWrapper.NetworkError>) in
+            completion(result)
         }
     }
     
-    func makeDecodedRequest(){
-        network.request(url: url) { (result: Result<[User], NetworkError>) in
+    func postUser(user: User, completion: @escaping (Result<Void, NetworkWrapper.NetworkError>) -> Void) {
+        var request = URLRequest(url: baseURL.appendingPathComponent("users"))
+        request.httpMethod = "POST"
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try? JSONEncoder().encode(user)
+        networkWrapper.request(with: request) { (result: Result<Data, NetworkWrapper.NetworkError>) in
             switch result {
-            case .success(let users):
-                print("Users: \(users)")
+            case .success:
+                completion(.success(()))
             case .failure(let error):
-                print("Error: \(error)")
+                completion(.failure(error))
             }
         }
     }
 }
+
